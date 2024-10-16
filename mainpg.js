@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Image, ImageBackground, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import axios from 'axios';
 import { IPADDRESS } from "./IPaddress";
+import { SliderBox } from "react-native-image-slider-box";
 
 const Mainpg = ({ navigation }) => {
 
@@ -18,18 +19,18 @@ const Mainpg = ({ navigation }) => {
         fetch(IPADDRESS + '/pro')
             .then(res => res.json())
             .then(data => setproduct(data.data));
-           
+
 
         fetch(IPADDRESS + '/cat')
             .then(res => res.json())
-            .then(data =>
-               {       
-                 setcat(data.data);
-                 console.log(data , "hello");
-                }
-                );
+            .then(data => {
+                setcat(data.data);
+            }
+            );
 
     }, [])
+
+
 
     const banner = [
         require('./image/banner.png'),
@@ -48,9 +49,12 @@ const Mainpg = ({ navigation }) => {
                         <View>
                             <Image style={{ height: 35, width: 35 }} source={require('./image/favorite.png')}></Image>
                         </View>
-                        <View>
-                            <Image style={{ height: 35, width: 35 }} source={require('./image/cart.png')}></Image>
-                        </View>
+                        <Pressable onPress={()=>{navigation.navigate("productbag")}}>
+                            <View>
+                                <Image style={{ height: 35, width: 35 }} source={require('./image/cart.png')}></Image>
+                            </View>
+                        </Pressable>
+
                     </View>
 
                     {/* catogary image */}
@@ -66,7 +70,7 @@ const Mainpg = ({ navigation }) => {
 
                                                 <View style={{ margin: 5, alignItems: 'center', width: 80 }} key={index}>
                                                     <Pressable>
-                                                        <Image style={style.catimg} source={{ uri: `${IPADDRESS}/images/${item.cat_image}`}}></Image>
+                                                        <Image style={style.catimg} source={{ uri: `${IPADDRESS}/images/${item.cat_image}` }}></Image>
                                                         <Text style={{ color: '#ccc5b9', fontSize: 10 }}>{item.name}</Text>
                                                     </Pressable>
                                                 </View>
@@ -87,6 +91,7 @@ const Mainpg = ({ navigation }) => {
                     <ScrollView>
 
                         {/* advertise banner */}
+
 
                         <View style={{ height: 200, width: '100%', margin: 8 }}>
 
@@ -109,16 +114,18 @@ const Mainpg = ({ navigation }) => {
 
                         </View>
 
+
+
                         {/* product */}
 
                         <View style={{ display: 'flex', flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'center' }}>
                             {
-                                Product.map((item,index) => {
+                                Product.map((item, index) => {
                                     return (
                                         <>
                                             <View style={style.productbox} key={item.id}>
                                                 {/* imagebox */}
-                                                <Pressable onPress={() => { navigation.navigate("product", { data: item, image: {  uri: `${IPADDRESS}/images/${item.pro_image}` } }) }}>
+                                                <Pressable onPress={() => { navigation.navigate("product", { 'id': item._id }) }}>
                                                     <View style={{ height: '70%' }}>
                                                         <ImageBackground style={{ height: "100%" }} source={{ uri: `${IPADDRESS}/images/${item.pro_image}` }}>
                                                             <View style={{ height: '100%', alignItems: 'flex-end', justifyContent: 'flex-end', padding: 6 }}>

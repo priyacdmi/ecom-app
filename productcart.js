@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { Image, Pressable, Text, View } from 'react-native';
+import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RazorpayCheckout from 'react-native-razorpay';
+import { useSelector } from 'react-redux';
+import { store } from './redux/store';
+import Product from './product';
+import { IPADDRESS } from './IPaddress';
 
 
 
@@ -9,57 +13,23 @@ const Productcart = ({ navigation, route }) => {
 
     // const { image } = route.params;
 
-    const cartdata = [];
-    const [cart, setcart] = useState([])
+    const cartdata = useSelector((store)=>store.cart)
 
     const [qtn, setqtn] = useState('1');
 
-    const plusqtn = () => {
+    const plusqtn = (ind) => {
         setqtn(parseInt(qtn) + 1);
     }
-    const minusqtn = () => {
+    const minusqtn = (ind) => {
         if (qtn != 1) {
             setqtn(qtn - 1);
         }
+  
+  
     }
 
-    const getData = async () => {
-        try {
-            const jsonValue = await AsyncStorage.getItem('cartdata');
-            if (jsonValue !== null) {
-                const val = JSON.parse(jsonValue);
-
-                cartdata.push(val);
-                setcart(cartdata)
-                storecartdata(cartdata)
-            }
-        } catch (e) {
-            // error reading value
-        }
-    };
-
-    const storecartdata = async (value) => {
-        try {
-            const jsonValue = JSON.stringify(value);
-            await AsyncStorage.setItem('storecart', jsonValue);
-          
-        } catch (e) {
-            // saving error
-        }
-    };
-    const getcartData = async () => {
-        try {
-            const jsonValue = await AsyncStorage.getItem('storecart');
-            if (jsonValue !== null) {
-                const val = JSON.parse(jsonValue);
-
-                setcart(val)
-            }
-        } catch (e) {
-            // error reading value
-        }
-    };
-
+   
+   
     const onPressBuy = () => {
         //Order Api: Call POST api with body like (username, id, price etc) to create an Order and use order_id in below options object
         // const response = await .....
@@ -92,27 +62,26 @@ const Productcart = ({ navigation, route }) => {
         };
 
     useEffect(() => {
-        getData()
-        navigation.addListener('focus', () => {
-
-            storecartdata();
-            getcartData();
-        })
+      
     }, [])
 
     return (
         <>
+        <ScrollView>
             <View style={{ width: '100%', margin: 20, display: 'flex', flexWrap: 'wrap' }}>
 
                 {
-                    cart.map((item, ind) => {
+                    cartdata!=null&&cartdata.cart.map((item, ind) => {
                         return (
 
                             <>
 
-                                <View style={{ height: 210, width: '90%', borderRadius: 10, backgroundColor: '#ccc5b9', flexDirection: 'row' }}>
+                                <View style={{ height: 210, width: '90%', borderRadius: 10, backgroundColor: '#ccc5b9', flexDirection: 'row',margin:10 }}>
                                     <View style={{ width: '40%', padding: 10 }}>
-                                        {/* <Image style={{ objectFit: 'cover', height: '100%' }} source={}></Image> */}
+
+                                      
+                                        <Image style={{ objectFit: 'cover', height: '100%' }} source={{ uri: `${IPADDRESS}/images/${item.pro_image}` }}></Image>
+    
                                     </View>
                                     <View style={{ width: '60%', padding: 10 }}>
                                         <Text style={{ color: 'black', fontSize: 14 }}>{item.name}</Text>
@@ -120,7 +89,7 @@ const Productcart = ({ navigation, route }) => {
                                         <Text style={{ color: 'black', fontSize: 10 }}>$ {item.price}</Text>
 
                                         <View style={{ height: 40, width: 140, flexDirection: 'row', borderColor: 'black', borderWidth: 1, zIndex: 1, marginTop: 15 }}>
-                                            <Pressable onPress={minusqtn}>
+                                            <Pressable onPress={()=>{minusqtn(ind)}}>
                                                 <View style={{ width: 40, height: 38, alignItems: 'center', justifyContent: 'center', borderColor: 'black', borderRightWidth: 1 }}>
                                                     <Text style={{ color: 'black', fontSize: 14 }}>-</Text>
                                                 </View>
@@ -128,7 +97,7 @@ const Productcart = ({ navigation, route }) => {
                                             <View style={{ width: 60, alignItems: 'center', justifyContent: 'center' }}>
                                                 <Text style={{ color: 'black', fontSize: 14 }}>{qtn}</Text>
                                             </View>
-                                            <Pressable onPress={plusqtn}>
+                                            <Pressable onPress={()=>{plusqtn(ind)}}>
                                                 <View style={{ width: 40, height: 38, alignItems: 'center', justifyContent: 'center', borderColor: 'black', borderLeftWidth: 1 }}>
                                                     <Text style={{ color: 'black', fontSize: 14 }}>+</Text>
                                                 </View>
@@ -155,6 +124,7 @@ const Productcart = ({ navigation, route }) => {
 
 
             </View>
+            </ScrollView>
         </>
     )
 }

@@ -17,6 +17,9 @@ import Payment from './payment';
 import Signup from './signup';
 import Login from './login';
 
+import { Provider } from 'react-redux';
+import { store } from './redux/store';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -26,7 +29,7 @@ function App() {
     <>
       {/* <Mainpg></Mainpg> */}
       {/* <Product></Product> */}
-
+      <Provider store={store}>
       <NavigationContainer>
         <Stack.Navigator>
 
@@ -39,6 +42,7 @@ function App() {
           {/* <Stack.Screen name='payment' component={Payment} /> */}
         </Stack.Navigator>
       </NavigationContainer>
+      </Provider>
       {/* <Razorpay></Razorpay> */}
 
     </>

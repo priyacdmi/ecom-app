@@ -3,10 +3,32 @@ import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
+import { IPADDRESS } from './IPaddress';
+import { Addtocart } from './redux/actions/cartaction';
+import { useSelector, useDispatch } from 'react-redux';
 
 const Product = ({ navigation, route }) => {
 
-    const { data, image } = route.params;
+    const { id } = route.params;
+    const [product, setproduct] = useState({})
+    const [Pid, setpid] = useState([])
+
+
+    useEffect(() => {
+
+        fetch(`${IPADDRESS}/pro/${id}`)
+            .then(res => res.json())
+            .then(data => setproduct(data.data));
+         
+    }, [id])
+   
+    const dispatch = useDispatch();
+
+    const handleaddcart = (val) => {
+        dispatch(Addtocart(val));
+        navigation.navigate("productbag")
+      };
+
 
     const colors = ["#d90429", "#03045e", "#ff0a54", "#000000", "#386641", "#fdc500"]
     const colorstring = ["Red", "Blue", "Pink", "Black", "Green", "Yellow"]
@@ -23,17 +45,6 @@ const Product = ({ navigation, route }) => {
         setsize(sizestring[index])
     }
 
-    const storeData = async (value) => {
-        try {
-          const jsonValue = JSON.stringify(value);
-          await AsyncStorage.setItem('cartdata', jsonValue);
-            navigation.navigate('productbag')  
-        } catch (e) {
-          // saving error
-        }
-      };
-
-
 
     return (
         <View style={{ backgroundColor: 'white', height: '100%' }}>
@@ -44,7 +55,7 @@ const Product = ({ navigation, route }) => {
                         <View style={{ flexDirection: 'row' }}>
 
                             <View style={{ margin: 8 }}>
-                                <Image style={{ objectFit: 'cover', width: 390, height: '100%' }} source={image}></Image>
+                                <Image style={{ objectFit: 'cover', width: 390, height: '100%' }} source={{ uri: `${IPADDRESS}/images/${product.pro_image}` }}></Image>
                             </View>
 
                         </View>
@@ -54,12 +65,13 @@ const Product = ({ navigation, route }) => {
 
 
                 {/* product brand,price */}
+
                 <View style={{ margin: 14 }}>
-                    <Text style={{ color: '#6c757d' }}>{data.name}</Text>
-                    <Text style={{ color: '#6c757d', fontSize: 11 }}>{data.title}</Text>
+                    <Text style={{ color: '#6c757d' }}>{product.name}</Text>
+                    <Text style={{ color: '#6c757d', fontSize: 11 }}>{product.title}</Text>
                     <View style={{ flexDirection: 'row' }}>
-                        <Text style={{ color: 'black', fontSize: 12, fontWeight: 600 }}>$ {data.price}</Text>
-                        <Text style={{ color: '#6c757d', fontSize: 12, textDecorationLine: "line-through" }}>$ {data.price + 33} </Text>
+                        <Text style={{ color: 'black', fontSize: 12, fontWeight: 600 }}>$ {product.price}</Text>
+                        <Text style={{ color: '#6c757d', fontSize: 12, textDecorationLine: "line-through" }}>$ {product.price + 33} </Text>
                         <Text style={{ color: '#16db65', fontSize: 12 }}>74% OFF</Text>
                     </View>
                     <Text style={{ color: '#6c757d', fontSize: 8 }}>Price inclusive of all taxes</Text>
@@ -120,7 +132,7 @@ const Product = ({ navigation, route }) => {
 
                 <View style={{ margin: 20 }}>
                     <Text style={{ color: 'black', marginBottom: 10, fontSize: 12, fontWeight: 600 }}>Product Details</Text>
-                    <Text style={{ color: 'black', fontSize: 9 }}>{data.des}</Text>
+                    <Text style={{ color: 'black', fontSize: 9 }}>{product.des}</Text>
                 </View>
 
                 <View style={{ height: 5, backgroundColor: '#ccc5b9' }}></View>
@@ -136,13 +148,13 @@ const Product = ({ navigation, route }) => {
                         <Icon name="heart" size={40} color="#000" />
                     </View>
 
-                    <View style={{width: '60%', backgroundColor: "#000", justifyContent: 'center', alignItems: 'center',borderRadius:10 }}>
-                        {/* <Pressable onPress={() => { navigation.navigate("productbag", { data: data, image:image })  }}> */}
-                        <Pressable onPress={()=>storeData(data)}>
-                            <View style={{width:'auto'}}>
+                    <View style={{ width: '60%', backgroundColor: "#000", justifyContent: 'center', alignItems: 'center', borderRadius: 10 }}>
+                        {/* <Pressable onPress={() => { navigation.navigate("productbag") }}> */}
+                        <Pressable onPress={() => handleaddcart(product)}>
+                            <View style={{ width: 'auto' }}>
                                 <Icon name="shopping-cart" size={40} >
                                     <Text style={{ fontFamily: 'Arial', fontSize: 20 }}>
-                                         Add to Bag
+                                        Add to Bag
                                     </Text>
                                 </Icon>
                             </View>
